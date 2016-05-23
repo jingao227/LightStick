@@ -3,19 +3,25 @@ import io.netty.channel.group.ChannelGroup;
 
 public class ClubInfo {
     private static int clubId;
+    private static String password;
     private static int maxConnection;
     private static int connectedNum;
 
     private static volatile ChannelGroup channelGroup;
 
-    ClubInfo(final int id, int max, ChannelGroup cg) {
+    ClubInfo(final int id, String pwd, int max, ChannelGroup cg) {
         clubId = id;
+        password = pwd;
         maxConnection = max;
         channelGroup = cg;
     }
 
     int getClubId() {
         return clubId;
+    }
+
+    boolean isValid(String pwd) {
+        return pwd.equals(password);
     }
 
     boolean reachedMax() {

@@ -1,15 +1,24 @@
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
-/**
- * Created by aojing on 2016/5/19.
- */
 public class TixmateClient {
+
+    private static ExecutorService pool = Executors.newCachedThreadPool();
+
     public static void main(String[] args) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -19,6 +28,7 @@ public class TixmateClient {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new ObjectDecoder(1024, ClassResolvers.cacheDisabled(null)));
+                            ch.pipeline().addLast(new ObjectEncoder());
                             ch.pipeline().addLast(new ReadHandler());
                             System.out.println("已连接服务器");
                         }
@@ -40,7 +50,11 @@ public class TixmateClient {
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
             System.out.println("Tixmate客户端收到消息：" + msg);
-            if (msg.equals("OK")) ctx.writeAndFlush(String.valueOf(1) + String.valueOf("/") + String.valueOf("null"));
+            if (msg.equals("OK")) {
+                String writeMsg = String.valueOf(1) + String.valueOf("/null/null");
+                System.out.println(writeMsg);
+                ctx.writeAndFlush(writeMsg);
+            }
         }
 
     }

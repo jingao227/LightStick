@@ -22,7 +22,7 @@ public class NettyServer {
 
     private static void init() {
         clubMap = new HashMap<Integer, ClubInfo>();
-        clubMap.put(1, new ClubInfo(1, 999, new DefaultChannelGroup(GlobalEventExecutor.INSTANCE)));
+        clubMap.put(1, new ClubInfo(1, "123", 999, new DefaultChannelGroup(GlobalEventExecutor.INSTANCE)));
     }
 
     private static void bootServer() throws InterruptedException {
@@ -65,7 +65,10 @@ public class NettyServer {
                                                 club.addChannelGroup(ctx.channel());
                                                 System.out.println("连接加入channelGroup");
                                             } else ctx.writeAndFlush("已达到连接上限");
-                                        } else club.writeGroupChannel(ci[1]);
+                                        } else if (club.isValid(ci[1])) {
+                                            System.out.println("密码正确，发送：" + msg);
+                                            club.writeGroupChannel(ci[2]);
+                                        } else ctx.writeAndFlush("密码错误");
                                 }
 
 
